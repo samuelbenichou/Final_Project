@@ -1,7 +1,9 @@
-from Model.Streaming.Streaming import Stream_Data
-from Model.OL.OLModel import MODELS
-from Model.OFS.OFSAlgo import Algorithms
-from Model.Analyze import Analyze
+# from Model.OL.OLModel import MODELS
+# from Model.OFS.OFSAlgo import Algorithms
+# from Model.Streaming import Stream_Data
+# from Model.Analyze import Analyze
+from Controller.controller import Controller
+
 import scipy.io
 import os
 import numpy as np
@@ -10,8 +12,8 @@ def run_simulation(path,target_name,target_index,fs_model_index,fs_model_parms,o
     stream = Stream_Data()
     stream.set_batch_size(batch_size)
     stream.set_num_feature(50)
-    stream.set_ol(MODELS[ol_model_index])
-    stream.set_ofs(Algorithms[fs_model_index])
+    stream.set_ol(Controller.OL_CONTROLLER[ol_model_index])
+    stream.set_ofs(Controller.OFS_CONTROLLER[fs_model_index])
     if mat:
         mat = scipy.io.loadmat(path)
         X = mat['X']  # data
