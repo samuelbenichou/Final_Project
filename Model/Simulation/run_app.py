@@ -127,4 +127,4 @@ def apply_fires(df_name, tgt_index, epochs=1, batch_sizes = [25, 50, 75, 100], f
     print(f'Final avg stab score: {sum(final_stab_lst) / len(final_stab_lst)}')
 
 if __name__ == "__main__":
-    apply_fires(df_name='/Users/samuelbenichou/Downloads/normalize/electricity_data.csv', tgt_index=0, epochs=1)
+    apply_fires(df_name='file_path', tgt_index=0, epochs=1)
