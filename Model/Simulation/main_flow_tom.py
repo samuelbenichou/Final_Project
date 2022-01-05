@@ -1,4 +1,3 @@
-
 def msg(data):
     while True:
         OFS_choose = input(
@@ -7,7 +6,7 @@ def msg(data):
             try:
                 tgt_index = int(input("Please enter your index target label (the classifier)"))
                 fraction = int(input("Please enter a fraction value"))
-                apply_fires(data,tgt_index,fraction)
+                apply_fires(data, tgt_index, fraction)
             except Exception as e:
                 print(e)
 
@@ -33,7 +32,7 @@ def msg(data):
                 alpha = int(input("Please enter alpha value"))
                 max_iter = int(input("Please enter max iteration value"))
 
-            elif OL_choose == '3':  #TODO what are naive baise params?
+            elif OL_choose == '3':  # TODO what are naive baise params?
                 pass
 
             elif OL_choose == '4':
@@ -48,6 +47,7 @@ def msg(data):
                 sys.stdout.write("invalid input, please try agian")
         except Exception as e:
             print(e)
+
 
 if __name__ == "__main__":
     # apply_fires(df_name='file_path', tgt_index=0, epochs=1)
@@ -77,7 +77,7 @@ if __name__ == "__main__":
                 sys.stdout.write("invalid input, please try again")
                 continue
 
-        elif choice == '2':   # shuffle from data, working on all features
+        elif choice == '2':  # shuffle from data, working on all features
             batch_size = int(input("enter batch size"))
             msg(data)
 
