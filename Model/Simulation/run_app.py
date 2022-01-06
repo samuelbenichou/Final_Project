@@ -12,6 +12,8 @@ from Model.OFS import fires as fires
 from docx import Document
 import timeit
 import os
+import dask.dataframe as dd
+
 
 warnings.simplefilter(action='ignore', category=FutureWarning)
 
@@ -101,8 +103,8 @@ def apply_fires(df_name, tgt_index, epochs=1, batch_sizes=[25, 50, 75, 100], fra
             # Average accuracy  and stability
             avg_acc = sum_acc / count_time_steps
             avg_stab = sum_stab / (stability_counter)
-            # print(f'avg acc score: {avg_acc}')
-            # print(f'stability score: {avg_stab}')
+            print(f'avg acc score: {avg_acc}')
+            print(f'stability score: {avg_stab}')
 
             final_stab_lst.append(avg_stab)
             final_acc_lst.append(avg_acc)
@@ -111,20 +113,20 @@ def apply_fires(df_name, tgt_index, epochs=1, batch_sizes=[25, 50, 75, 100], fra
             # Restart the FileStream
             stream.restart()
 
-        plt.figure()
-        plt.plot(fractions, final_acc_lst_per_batch, 'b', label='Accuracy over batch size of {}'.format(batch_size))
-        plt.xlabel('Fraction')
-        plt.ylabel('Accuracy')
-        plt.legend()
-        plt.savefig('plot.png')
-
-        p = document.add_paragraph()
-        r = p.add_run()
-        r.add_text('Accuracy over batch size of {}'.format(batch_size))
-        r.add_picture('plot.png')
-        stop = timeit.default_timer()
-        r.add_text('Runtime: {} seconds'.format(stop - start))
-        os.remove('plot.png')
+        # plt.figure()
+        # plt.plot(fractions, final_acc_lst_per_batch, 'b', label='Accuracy over batch size of {}'.format(batch_size))
+        # plt.xlabel('Fraction')
+        # plt.ylabel('Accuracy')
+        # plt.legend()
+        # plt.savefig('plot.png')
+        #
+        # p = document.add_paragraph()
+        # r = p.add_run()
+        # r.add_text('Accuracy over batch size of {}'.format(batch_size))
+        # r.add_picture('plot.png')
+        # stop = timeit.default_timer()
+        # r.add_text('Runtime: {} seconds'.format(stop - start))
+        # os.remove('plot.png')
 
     # document.save('report.docx')
 
@@ -132,23 +134,23 @@ def apply_fires(df_name, tgt_index, epochs=1, batch_sizes=[25, 50, 75, 100], fra
     print(f'Final avg stab score: {sum(final_stab_lst) / len(final_stab_lst)}')
 
 
-def msg(data, chunk_size, feature_precent=0.0,varying=False,trapizodal=False):
+def msg(data, chunk_size, feature_precent=0.0, varying=False, trapizodal=False):
     while True:
         OFS_choose = input(
             "Please choose an Online Feature Selection (OFS) algorithm: \n for FIRES press 1 \n for ABFS press 2 \n "
             "for MC-NN press 3")
         if OFS_choose == '1':
             try:
-                tgt_index = int(input("Please enter your index target label (the classifier)"))
-                fraction = int(input("Please enter a fraction value"))
                 feature_count = data_feature_sub.get_number_of_features_by_percentage(data, feature_precent)
-                for i in range(chunk_size, len(data), chunk_size):
+                for i in range(int(chunk_size), len(data), int(chunk_size)):
                     sub_data = data_feature_sub.select_sub_data_from_data(data, i)
                     if varying:
                         sub_data = data_feature_sub.select_feature_set_from_data(sub_data,feature_count)
                     elif trapizodal:
                         sub_data = data_feature_sub.expand_feature_set_from_data(sub_data,feature_count)
-                    apply_fires(sub_data, tgt_index, fraction)
+
+                    sub_data.to_csv('sub_data.csv')
+                    apply_fires('sub_data.csv', tgt_index=0, epochs=1)
             except Exception as e:
                 print(e)
 
@@ -196,9 +198,9 @@ def msg(data, chunk_size, feature_precent=0.0,varying=False,trapizodal=False):
 if __name__ == "__main__":
     # apply_fires(df_name='file_path', tgt_index=0, epochs=1)
     while True:
-        data_input = input("Please insert csv url path")
+        # data_input = input("Please insert csv url path")
         try:
-            data = pd.read_csv(data_input)
+            data = pd.read_csv('/Users/samuelbenichou/Downloads/normalize/electricity_data.csv')
         except Exception as e:
             print(e)
             continue
@@ -231,3 +233,5 @@ if __name__ == "__main__":
 
         else:  # bad key press
             continue
+
+        # /Users/samuelbenichou/Downloads/normalize/electricity_data.csv
