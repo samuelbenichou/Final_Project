@@ -14,11 +14,9 @@ import timeit
 import os
 import dask.dataframe as dd
 
-
 warnings.simplefilter(action='ignore', category=FutureWarning)
 
-
-def apply_fires(df_name, tgt_index, epochs=1, batch_sizes=[25, 50, 75, 100], fractions=[0.1, 0.15, 0.2]):
+def apply_fires(df_name, tgt_index, epochs=1, batch_sizes=[100], fractions=[0.2]):
     final_stab_lst = []
     final_acc_lst = []
     document = Document()
@@ -102,13 +100,13 @@ def apply_fires(df_name, tgt_index, epochs=1, batch_sizes=[25, 50, 75, 100], fra
 
             # Average accuracy  and stability
             avg_acc = sum_acc / count_time_steps
-            avg_stab = sum_stab / (stability_counter)
+            # avg_stab = sum_stab / (stability_counter)
             print(f'avg acc score: {avg_acc}')
-            print(f'stability score: {avg_stab}')
+            # print(f'stability score: {avg_stab}')
 
-            final_stab_lst.append(avg_stab)
+            # final_stab_lst.append(avg_stab)
             final_acc_lst.append(avg_acc)
-            final_stab_lst_per_batch.append(avg_stab)
+            # final_stab_lst_per_batch.append(avg_stab)
             final_acc_lst_per_batch.append(avg_acc)
             # Restart the FileStream
             stream.restart()
@@ -131,7 +129,7 @@ def apply_fires(df_name, tgt_index, epochs=1, batch_sizes=[25, 50, 75, 100], fra
     # document.save('report.docx')
 
     print(f'Final avg acc score: {sum(final_acc_lst) / len(final_acc_lst)}')
-    print(f'Final avg stab score: {sum(final_stab_lst) / len(final_stab_lst)}')
+    # print(f'Final avg stab score: {sum(final_stab_lst) / len(final_stab_lst)}')
 
 
 def msg(data, chunk_size, feature_precent=0.0, varying=False, trapizodal=False):
@@ -148,9 +146,8 @@ def msg(data, chunk_size, feature_precent=0.0, varying=False, trapizodal=False):
                         sub_data = data_feature_sub.select_feature_set_from_data(sub_data,feature_count)
                     elif trapizodal:
                         sub_data = data_feature_sub.expand_feature_set_from_data(sub_data,feature_count)
-
-                    sub_data.to_csv('sub_data.csv')
-                    apply_fires('sub_data.csv', tgt_index=0, epochs=1)
+                    sub_data.drop(sub_data.columns[0], axis=1).to_csv('sub_data.csv')
+                    apply_fires('sub_data.csv', tgt_index=1, epochs=1)
             except Exception as e:
                 print(e)
 
@@ -196,20 +193,20 @@ def msg(data, chunk_size, feature_precent=0.0, varying=False, trapizodal=False):
 
 
 if __name__ == "__main__":
-    # apply_fires(df_name='file_path', tgt_index=0, epochs=1)
+    # apply_fires(df_name='/Users/samuelbenichou/Downloads/normalize/electricity_data.csv', tgt_index=0, epochs=1)
     while True:
-        # data_input = input("Please insert csv url path")
+        data_input = input("Please insert csv url path")
         try:
-            data = pd.read_csv('/Users/samuelbenichou/Downloads/normalize/electricity_data.csv')
+            data = pd.read_csv(data_input)
         except Exception as e:
             print(e)
             continue
         choice = input(
-            "Please press 1 if you want stream. \n press 2 if you want batch.")
+            "Please press 1 if you want stream. \nPress 2 if you want batch. ")
 
         if choice == '1':  # stream
             feature_choice = input(
-                "Please press 1 if you want to run regular datastream \n press 2 if you want to use varying feature space \n press 3 for trapizodal.")
+                "Please press 1 if you want to run regular datastream \nPress 2 if you want to use varying feature space \nPress 3 for trapizodal. ")
             chunk_size = input("enter chunk size")
             if feature_choice == '1':
                 msg(data, chunk_size)
@@ -229,7 +226,7 @@ if __name__ == "__main__":
 
         elif choice == '2':  # shuffle from data, working on all features
             batch_size = int(input("enter batch size"))
-            msg(data)
+            msg(data) # Need to send params to msg
 
         else:  # bad key press
             continue

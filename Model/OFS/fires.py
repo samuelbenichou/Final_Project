@@ -45,8 +45,8 @@ class FIRES:
         if self.model == 'probit' and tuple(target_values) != (-1, 1):
             if len(np.unique(target_values)) == 2:
                 self.model_param['probit'] = True  # Indicates that we need to encode the target variable into {-1,1}
-                warn('FIRES WARNING: The target variable will be encoded as: {} = -1, {} = 1'.format(
-                    self.target_values[0], self.target_values[1]))
+                # warn('FIRES WARNING: The target variable will be encoded as: {} = -1, {} = 1'.format(
+                #     self.target_values[0], self.target_values[1]))
             else:
                 raise ValueError('The target variable y must be binary.')
 
