@@ -9,12 +9,10 @@ from Model.Simulation.parse import Parse
 
 class Controller:
     OFS_CONTROLLER = {
-        'Alpha Investing': 'AlphaInvesting',
-        'SAOLA': 'Saola',
-        'OSFS': 'OSFS',
-        'F-OSFS': 'FastOSFS',
-        'Fires': 'Fires',
-        'Without OFS': None
+        'MCNN': 'MCNN',
+        'ABFS': 'ABFS',
+        'Fires': 'fires',
+        'None': None
     }
 
     OL_CONTROLLER = {

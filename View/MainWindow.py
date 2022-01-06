@@ -368,26 +368,12 @@ class Window:
         This method checks the validation of parameters for OFS algorithms
         '''
         if self.ofs_menu[OFS_OPTIONS[0]][1].get() == 1:
-            if self.alpha_investing_params.validation()[0] == False:
-                self.popup(
-                    "Alpha Investing: Please Enter a valid value to " + self.alpha_investing_params.validation()[1],
-                    "Error")
-                return False
+            pass
         if self.ofs_menu[OFS_OPTIONS[1]][1].get() == 1:
-            if self.saola_params.validation()[0] == False:
-                self.popup("SAOLA: Please Enter a valid value to " + self.saola_params.validation()[1], "Error")
-                return False
+            pass
         if self.ofs_menu[OFS_OPTIONS[2]][1].get() == 1:
-            if self.osfs_params.validation()[0] == False:
-                self.popup("OSFS: Please Enter a valid value to " + self.osfs_params.validation()[1], "Error")
-                return False
-        if self.ofs_menu[OFS_OPTIONS[3]][1].get() == 1:
-            if self.f_osfs_params.validation()[0] == False:
-                self.popup("F-OSFS: Please Enter a valid value to " + self.f_osfs_params.validation()[1], "Error")
-                return False
-        if self.ofs_menu[OFS_OPTIONS[4]][1].get() == 1:
             if self.fires_params.validation()[0] == False:
-                self.popup("Fires: Please Enter a valid value to " + self.fires_params.validation()[1], "Error")
+                self.popup("OSFS: Please Enter a valid value to " + self.osfs_params.validation()[1], "Error")
                 return False
         return True
 
