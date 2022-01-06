@@ -6,6 +6,18 @@ from View.Frames import *
 from Controller.controller import Controller
 import os, threading
 
+# Data type options
+DATA_OPTIONS = [
+    "Stream",
+    "Shuffle"
+]
+
+FEATURE_SET_OPTIONS = [
+    "Regular",
+    "Varying",
+    "Trapezoidal"
+]
+
 # Online learning options
 OL_OPTIONS = [
     'K-NN',
@@ -16,12 +28,10 @@ OL_OPTIONS = [
 
 # Online feature selection options
 OFS_OPTIONS = [
-    'Alpha Investing',
-    'SAOLA',
-    'OSFS',
-    'F-OSFS',
+    'MCNN',
+    'ABFS',
     'Fires',
-    'Without OFS'
+    'None'
 ]
 
 
@@ -37,6 +47,24 @@ class Window:
         The constructor calls the methods that fill the frames
         The constructor calls the methods that set frames positions in the window
         '''
+        self.chunk_size_input = None
+        self.chunk_size_label = None
+        self.total_exp = None
+        self.target_index_input = None
+        self.target_index_lable = None
+        self.batch_size_input = None
+        self.batch_size_label = None
+        self.feature_percentage_input = None
+        self.feature_type_menu = None
+        self.feature_var = None
+        self.feature_type_label = None
+        self.data_type_menu = None
+        self.data_var = None
+        self.data_type_label = None
+        self.run_btn = None
+        self.pb_label = None
+        self.pb = None
+        self.feature_percentage_label = None
         self.root = root
         self.exp_params_frame = tk.Frame(root)
         self.ol_params_frame = tk.Frame(root)
@@ -53,7 +81,6 @@ class Window:
 
         self.set_item_position()
 
-
     def fill_exp_params_frame(self):
         '''
         This method fill the experiment params frame
@@ -64,8 +91,8 @@ class Window:
         self.create_selected_algo()
         self.pb = ttk.Progressbar(self.exp_params_frame, orient='horizontal', mode='determinate', length=280)
         self.pb_label = tk.Label(self.exp_params_frame)
-        self.run_btn = tk.Button(self.exp_params_frame, text="Run", command=self.run, relief=GROOVE)
-
+        self.run_btn = tk.Button(self.exp_params_frame, text="Run", command=self.run, relief=GROOVE, height=10,
+                                 width=10)
 
     def fill_ol_params_frame(self):
         '''
@@ -75,7 +102,6 @@ class Window:
         # tk.Label(self.ol_params_frame, text="OL Params:").pack(side = TOP,fill=X)
         self.create_ol_params()
 
-
     def fill_ofs_params_frame(self):
         '''
         This method fill the OFS params frame
@@ -83,17 +109,32 @@ class Window:
         tk.Label(self.ofs_params_frame, text="OFS Params:").grid(row=0, column=0, sticky=W)
         self.create_ofs_params()
 
-
     def create_exp_params(self):
         '''
         This method creates fields for the experiment parameters
         '''
-        self.bach_size_label = tk.Label(self.exp_params_frame, text="Enter bach size:")
-        self.bach_size_input = tk.Entry(self.exp_params_frame)
+
+        self.data_type_label = tk.Label(self.exp_params_frame, text="Choose data type:")
+        self.data_var = StringVar(self.exp_params_frame)
+        self.data_var.set(DATA_OPTIONS[0])
+        self.data_type_menu = OptionMenu(self.exp_params_frame, self.data_var, *DATA_OPTIONS)
+        
+        self.chunk_size_label = tk.Label(self.exp_params_frame, text="Enter chunk size:")
+        self.chunk_size_input = tk.Entry(self.exp_params_frame)
+
+        self.feature_type_label = tk.Label(self.exp_params_frame, text="Choose feature set type:")
+        self.feature_var = StringVar(self.exp_params_frame)
+        self.feature_var.set(FEATURE_SET_OPTIONS[0])
+        self.feature_type_menu = OptionMenu(self.exp_params_frame, self.feature_var, *FEATURE_SET_OPTIONS)
+
+        self.feature_percentage_label = tk.Label(self.exp_params_frame, text="Enter feature percentage:")
+        self.feature_percentage_input = tk.Entry(self.exp_params_frame)
+
+        self.batch_size_label = tk.Label(self.exp_params_frame, text="Enter batch size:")
+        self.batch_size_input = tk.Entry(self.exp_params_frame)
 
         self.target_index_lable = tk.Label(self.exp_params_frame, text="Enter target index:")
         self.target_index_input = tk.Entry(self.exp_params_frame)
-
 
     def create_db_chooser(self):
         '''
@@ -133,29 +174,22 @@ class Window:
         self.nb_params = NB_Param(self.ol_params_frame)
         self.ol_algorithms.update({OL_OPTIONS[3]: self.nb_params})
 
-
     def create_ofs_params(self):
         '''
         This method create fields for OFS params
         '''
-        self.alpha_investing_params = AI_Param(self.ofs_params_frame)
-        self.ofs_algorithms.update({OFS_OPTIONS[0]: self.alpha_investing_params})
-
-        self.saola_params = SAOLA_Param(self.ofs_params_frame)
-        self.ofs_algorithms.update({OFS_OPTIONS[1]: self.saola_params})
-
-        self.osfs_params = OSFS_Param(self.ofs_params_frame)
-        self.ofs_algorithms.update({OFS_OPTIONS[2]: self.osfs_params})
-
-        self.f_osfs_params = F_OSFS_Param(self.ofs_params_frame)
-        self.ofs_algorithms.update({OFS_OPTIONS[3]: self.f_osfs_params})
 
         self.fires_params = Fires_Param(self.ofs_params_frame)
-        self.ofs_algorithms.update({OFS_OPTIONS[4]: self.fires_params})
+        self.ofs_algorithms.update({OFS_OPTIONS[0]: self.fires_params})
+
+        self.fires_params = Fires_Param(self.ofs_params_frame)
+        self.ofs_algorithms.update({OFS_OPTIONS[1]: self.fires_params})
+
+        self.fires_params = Fires_Param(self.ofs_params_frame)
+        self.ofs_algorithms.update({OFS_OPTIONS[2]: self.fires_params})
 
         self.without = Params_frame(self.ofs_params_frame)
-        self.ofs_algorithms.update({OFS_OPTIONS[5]: self.without})
-
+        self.ofs_algorithms.update({OFS_OPTIONS[3]: self.without})
 
     def create_selected_algo(self):
         '''
@@ -197,7 +231,6 @@ class Window:
             else:
                 self.ofs_algorithms[ofs].grid_forget()
 
-
     def set_frame_position(self):
         '''
         This method set all frame position in tha main window
@@ -205,7 +238,6 @@ class Window:
         self.exp_params_frame.grid(row=0, column=0)
         self.ol_params_frame.grid(row=1, column=0, sticky=W)
         self.ofs_params_frame.grid(row=3, column=0, sticky=W)
-
 
     def set_item_position(self):
         '''
@@ -219,10 +251,22 @@ class Window:
         self.btn_browse_to_save_path.grid(row=2, column=0, sticky=N)
         self.save_path.grid(row=3, column=0, sticky=W)
 
-        self.bach_size_label.grid(row=0, column=1, sticky=W)
-        self.bach_size_input.grid(row=0, column=2, sticky=W)
-        self.target_index_lable.grid(row=1, column=1, sticky=W)
-        self.target_index_input.grid(row=1, column=2, sticky=W)
+        self.data_type_label.grid(row=0, column=1, sticky=W)
+        self.data_type_menu.grid(row=0, column=2, sticky=W)
+        
+        self.chunk_size_label.grid(row=1, column=1, sticky=W)
+        self.chunk_size_input.grid(row=1, column=2, sticky=W)
+
+        self.feature_type_label.grid(row=2, column=1, sticky=W)
+        self.feature_type_menu.grid(row=2, column=2, sticky=W)
+
+        self.feature_percentage_label.grid(row=3, column=1, sticky=W)
+        self.feature_percentage_input.grid(row=3, column=2, sticky=W)
+
+        self.batch_size_label.grid(row=4, column=1, sticky=W)
+        self.batch_size_input.grid(row=4, column=2, sticky=W)
+        self.target_index_lable.grid(row=5, column=1, sticky=W)
+        self.target_index_input.grid(row=5, column=2, sticky=W)
 
         self.ol_lable.grid(row=0, column=3, sticky=W)
         i = 1
@@ -236,24 +280,14 @@ class Window:
             self.ofs_menu[ofs][0].grid(row=i, column=4, sticky=W)
             i = i + 1
 
-        self.run_btn.grid(row=3, column=2, sticky=W)
-
-        # self.knn_params.grid(row=1, column=0,sticky = NW)
-        # self.nn_params.grid(row=1, column=1,sticky = NW)
-        # self.rf_params.grid(row=1, column=2, sticky = NW)
-        # self.nb_params.grid(row=1, column=3,sticky = NW)
-
-        # self.alpha_investing_params.grid(row=1, column=0,sticky = NW)
-        # self.saola_params.grid(row=1, column=1,sticky = NW)
-        # self.osfs_params.grid(row=1, column=2, sticky = NW)
-        # self.f_osfs_params.grid(row=1, column=3,sticky = NW)
-        # self.fires_params.grid(row=1, column=4, sticky=NW)
+        self.run_btn.grid(row=1, rowspan=5, column=6, sticky=W)
 
     def open_browse_to_db_path(self):
         '''
         This method open a browse window and catch the chosen file path
         '''
-        file = tk.filedialog.askopenfile(parent=self.exp_params_frame, title='Choose a file',filetypes=(('csv files', 'csv'),('arff files', 'arff')))
+        file = tk.filedialog.askopenfile(parent=self.exp_params_frame, title='Choose a file',
+                                         filetypes=(('csv files', 'csv'), ('arff files', 'arff')))
         if file:
             self.path_to_db.set(file.name)
             file.close()
@@ -264,7 +298,6 @@ class Window:
         '''
         directory = tk.filedialog.askdirectory(parent=self.exp_params_frame, title='Choose a directory')
         self.path_to_save.set(directory)
-
 
     def exp_params_frame_validation(self):
         '''
@@ -284,10 +317,10 @@ class Window:
         if not is_dig:
             self.popup("Please Enter a valid target index", "Error")
             return False
-        if self.bach_size_input.get() == "":
+        if self.batch_size_input.get() == "":
             self.popup("Please Enter bach size", "Error")
             return False
-        if not self.bach_size_input.get().isnumeric() or int(self.bach_size_input.get()) <= 0:
+        if not self.batch_size_input.get().isnumeric() or int(self.batch_size_input.get()) <= 0:
             self.popup("Please Enter a valid bach size", "Error")
             return False
         ofs_flag = False
@@ -414,7 +447,6 @@ class Window:
         self.pb_label.configure(text=text)
         self.pb['value'] += (100 / self.total_exp)
 
-
     def run(self):
         '''
         Main method to start the experiments
@@ -425,20 +457,30 @@ class Window:
             return
         if not self.ofs_params_frame_validation():
             return
+
         file_path = self.path_to_db.get()
         file_name = os.path.basename(file_path).split(".")[0]
         path_to_save = self.path_to_save.get()
+
+        data_type = str(self.data_var.get())
+        chunk_size = int(self.chunk_size_input.get())
+
+        feature_set_type = str(self.feature_var.get())
+        feature_percentage = float(self.feature_percentage_input.get())
+
         file_target_index = int(self.target_index_input.get())
-        window_sizes = [int(self.bach_size_input.get())]
+        batch_size = int(self.batch_size_input.get())
+
         selected_ol = self.get_selected_ol()
         selected_ofs = self.get_selected_ofs()
+
         num_of_exp = len(selected_ol) * len(selected_ofs)
         self.show_pb(num_of_exp)
 
-        arg_dict = {'file_path':file_path, 'file_name':file_name, 'export_path':path_to_save,
-                    'ofs_algos':selected_ofs, 'ol_models':selected_ol,
-                    'file_target_index' : file_target_index,'window_sizes':window_sizes,'window_instance':self}
+        arg_dict = {'file_path': file_path, 'file_name': file_name, 'export_path': path_to_save,
+                    'data_type': data_type, 'feature_set_type': feature_set_type, 'feature_percentage': feature_percentage,
+                    'file_target_index': file_target_index, 'batch_size': batch_size, 'chunk_size': chunk_size,
+                    'ofs_algos': selected_ofs, 'ol_models': selected_ol, 'window_instance': self}
 
         thread_func = threading.Thread(target=Controller.run_multi_experiments, kwargs=arg_dict)
         thread_func.start()
-
