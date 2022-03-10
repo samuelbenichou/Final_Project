@@ -21,16 +21,16 @@ FEATURE_SET_OPTIONS = [
 # Online learning options
 OL_OPTIONS = [
     'K-NN',
-    'Perceptron Mask (ANN)',
-    'Random Forest',
-    'Naive-Bayes'
+    'Naive-Bayes',
+    'HoeffdingTree',
+    'HoeffdingAdaptiveTree'
 ]
 
 # Online feature selection options
 OFS_OPTIONS = [
-    'MCNN',
     'ABFS',
     'Fires',
+    'MCNN',
     'None'
 ]
 
